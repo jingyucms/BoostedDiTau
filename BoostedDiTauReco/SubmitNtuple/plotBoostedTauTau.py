@@ -305,8 +305,12 @@ def select_Nm1(l1, l2, ljet, ms, l2dm, channel):
                 if mSVFit >= event_cut['mass'] :
                     if pass_deltaR(l1, l2, ljet, channel) == 1 :
                         plot_variable(channel+'_NmJetcut', l1, l2, ljet , ms) #Nmjet
-                    if ljet.Pt() > event_cut['jetpt'] : 
+                    if ljet.Pt() > event_cut['jetpt'] :
                         plot_variable(channel+'_NmdRcut', l1, l2, ljet , ms) #NmDRcut
+                        if l1.DeltaR(l2) <= event_cut["dRl"] :
+                            plot_variable(channel+'_NmdRjcut', l1, l2, ljet , ms) #NmDRjcut
+                        if ljet.DeltaR(l1+l2) >= event_cut["dRlj"]  :
+                            plot_variable(channel+'_NmdRlcut', l1, l2, ljet , ms) #NmDRlcut
             if pass_deltaR(l1, l2, ljet, channel) == 1 :
                 mSVFit = get_svfit(l1, l2, 0, channel)
                 if mSVFit >= event_cut['mass'] :
@@ -343,6 +347,11 @@ def select_Nm1(l1, l2, ljet, ms, l2dm, channel):
                     if mSVFit >= event_cut['mass'] :
                         if ljet.Pt() > event_cut['jetpt'] :
                             plot_variable(channel+'_NmdRcut', l1, l2, ljet , ms) #NmDRcut
+                            if l1.DeltaR(l2) >= event_cut["dRltau"]:
+                                if l1.DeltaR(l2) <= event_cut["dRl"]:
+                                    plot_variable(channel+'_NmdRlcut', l1, l2, ljet , ms) #NmDRlcut
+                                if ljet.DeltaR(l1+l2) >= event_cut["dRlj"]:
+                                    plot_variable(channel+'_NmdRjcut', l1, l2, ljet , ms) #NmDRjcut
 
 
 
@@ -1188,6 +1197,15 @@ for iev in range(fchain.GetEntries()): # Be careful!!!
                         h['hNonIsoElectronPt'].Fill(ielectron.pt, weight)
                         s_nonisoelectron+=[ielectron]
 
+    s_tauUncleanNom = []
+
+    if tausUnCleaned.size() > 0 :
+        for i in range(tausUnCleaned.size()):
+            itau = tausUnCleaned.at(i)
+            if abs(itau.eta) < 2.3 and itau.pt >= 20.0:
+                if itau.mvaid >= 4:
+                    s_tauUncleanNom+=[itau]
+                        
     s_tauEcleanNom = []
     s_tauEcleanAlt = []
     s_tauEcleanAltVLoose = []
@@ -1255,6 +1273,9 @@ for iev in range(fchain.GetEntries()): # Be careful!!!
     if len(s_muon) >= 1 and len(s_jet) >= 1 and len(s_bjet) == 0 and len(s_tauMucleanAlt) >= 1: 
         mutau_channel(s_tauMucleanAlt, "Altered")
 
+    # if len(s_muon) >= 1 and len(s_jet) >= 1 and len(s_bjet) == 0 and len(s_tauUncleanNom) >= 1: 
+    #     mutau_channel(s_tauUncleanNom, "Uncleaned")
+    
     if len(s_muon) >= 1 and len(s_jet) >= 1 and len(s_bjet) == 0 and len(s_tauMucleanNom) >= 1: 
         if mutau_channel(s_tauMucleanNom, "Nominal") == 1 : continue
 
@@ -1266,6 +1287,10 @@ for iev in range(fchain.GetEntries()): # Be careful!!!
 
     if len(s_electron) >= 1 and len(s_tauEcleanNom) >= 1 and len(s_jet) >=1 and len(s_bjet) == 0 :
         etau_channel(s_tauEcleanNom, "Nominal")
+        
+    # if len(s_electron) >= 1 and len(s_tauUncleanNom) >= 1 and len(s_jet) >=1 and len(s_bjet) == 0 :
+    #     etau_channel(s_tauUncleanNom, "Uncleaned")
+
 
 
 out.cd()

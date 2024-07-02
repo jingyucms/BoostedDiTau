@@ -170,19 +170,21 @@ xsecs={
          'HT-400to600':4.05,
          'HT-600toInf':1.216},
      'TT':{
-         'TTTo2L2Nu_TuneCP5':88.2497,
-         'TTToSemiLeptonic_TuneCP5':365.30899,
-         'TTToHadronic_TuneCP5':377.9517},
+         'TTTo2L2Nu_TuneCP5':88.2497},
+         # 'TTToSemiLeptonic_TuneCP5':365.30899,
+         # 'TTToHadronic_TuneCP5':377.9517},
      'ST':{
          's-channel':3.549,
-         't-channel_antitop':26.2278,
-         't-channel_top':44.07048,
-         'tW_antitop':35.6,
-         'tW_top':35.6},
+         # 't-channel_antitop':26.2278,
+         # 't-channel_top':44.07048,
+         't_antitop':71.75,
+         't_top':119.7,
+         'tW_antitop':32.51,
+         'tW_top':32.45},
      'Diboson':{
-         'WW':75.95,
-         'WZ':27.59,
-         'ZZ':12.17},
+         'WW':76.25,
+         'WZ':27.55,
+         'ZZ':12.23},
       'WJetsToLNu_flat':{
           'TuneCP5':52940.0},
       'WJetsToLNu':{
@@ -238,13 +240,13 @@ xsecsQCD = {
 }
 
 
-#print(xsecs)
-
 if args.filename :
     fileName = args.filename
 
+
 def weightBackgroundHists(hists, files, version, study, var, Sample):
     for sample in Sample:
+        h = None
         for mass in list(xsecs[sample]):
             if gen==True:
                 filename="h_Gen_"+sample+"_"+mass+"_"+version+".root"
@@ -257,29 +259,37 @@ def weightBackgroundHists(hists, files, version, study, var, Sample):
             files+=[fil]
             hist=fil.Get(histname) 
             nEvt=fil.Get("NEvents").GetBinContent(2)
-            xsec=xsecs[sample][mass] 
+            xsec=xsecs[sample][mass]
             if list(xsecs[sample]).index(mass)==0:  
-                h = hist.Clone(sample+"_"+histname)
-                if scaling == 'xsection':
-                    h.Scale((xsec/nEvt)*L)
-                else: 
-                    scale = 1/(h.Integral())
-                    h.Scale(scale)
-                hists[sample] = h 
+                h = hist.Clone(sample+"_"+histname)                                                 
+                h.Scale((xsec/nEvt)*L)
+                hists[sample] = h                    
             else: 
-                if scaling == 'xsection': 
-                    hist.Scale((xsec/nEvt)*L)
-                else:
-                    hist.Scale(scale)
+                hist.Scale((xsec/nEvt)*L)
                 hists[sample].Add(hist)
+
+            # if h == None:
+            #     try:
+            #         h = hist.Clone(sample+"_"+histname)                                                                      
+            #         h.Scale((xsec/nEvt)*L)                                                                           
+            #         hists[sample] = h
+            #     except ReferenceError:
+            #         continue
+            # else:                                                                                                                          
+            #     hist.Scale((xsec/nEvt)*L)                                                                                                  
+            #     hists[sample].Add(hist)             
+
 
 
 hists = {}
 files = []
 
-
-#L = 41480.0
-L = 36700.0
+#L = 41530.0 #2017
+#L = 36700.0
+#L = 36700.0 #2016
+L = 59740.0 #2018
+#L = 7100.0 #2018Eras
+#L = 137600.0 #Full RunII
 #L = 1
 #-------------
 
@@ -305,17 +315,17 @@ if args.tcp :
     Sample = signal_sample
 #    Sample = ['ALP_Ntuple_m_30_htj_100to400','ALP_Ntuple_m_30_htj_400toInf']
 if args.all :
-    # signal_sample = ['ALP_Ntuple_m_15_htj_100to400', 'ALP_Ntuple_m_15_htj_400toInf','ALP_Ntuple_m_20_htj_100to400', 'ALP_Ntuple_m_20_htj_400toInf','ALP_Ntuple_m_25_htj_100to400', 'ALP_Ntuple_m_25_htj_400toInf','ALP_Ntuple_m_30_htj_100to400','ALP_Ntuple_m_30_htj_400toInf','ALP_Ntuple_m_35_htj_100to400', 'ALP_Ntuple_m_35_htj_400toInf','ALP_Ntuple_m_40_htj_100to400', 'ALP_Ntuple_m_40_htj_400toInf','ALP_Ntuple_m_45_htj_100to400', 'ALP_Ntuple_m_45_htj_400toInf', 'ALP_Ntuple_m_50_htj_100to400', 'ALP_Ntuple_m_50_htj_400toInf', 'ALP_Ntuple_m_60_htj_100to400', 'ALP_Ntuple_m_60_htj_400toInf','ALP_Ntuple_m_65_htj_100to400', 'ALP_Ntuple_m_65_htj_400toInf','ALP_Ntuple_m_55_htj_100to400', 'ALP_Ntuple_m_55_htj_400toInf']
-    # signal_sample = ['ALP_Ntuple_m_30_htj_100to400','ALP_Ntuple_m_30_htj_400toInf', 'ALP_Ntuple_m_20_htj_100to400', 'ALP_Ntuple_m_20_htj_400toInf', 'ALP_Ntuple_m_50_htj_100to400', 'ALP_Ntuple_m_50_htj_400toInf']
-    signal_sample = ['ALP_Ntuple_m_30_htj_100to400','ALP_Ntuple_m_30_htj_400toInf']
+    signal_sample = ['ALP_Ntuple_m_15_htj_100to400', 'ALP_Ntuple_m_15_htj_400toInf','ALP_Ntuple_m_20_htj_100to400', 'ALP_Ntuple_m_20_htj_400toInf','ALP_Ntuple_m_25_htj_100to400', 'ALP_Ntuple_m_25_htj_400toInf','ALP_Ntuple_m_30_htj_100to400','ALP_Ntuple_m_30_htj_400toInf','ALP_Ntuple_m_35_htj_100to400', 'ALP_Ntuple_m_35_htj_400toInf','ALP_Ntuple_m_40_htj_100to400', 'ALP_Ntuple_m_40_htj_400toInf','ALP_Ntuple_m_45_htj_100to400', 'ALP_Ntuple_m_45_htj_400toInf', 'ALP_Ntuple_m_60_htj_100to400', 'ALP_Ntuple_m_60_htj_400toInf','ALP_Ntuple_m_55_htj_100to400', 'ALP_Ntuple_m_55_htj_400toInf','ALP_Ntuple_m_50_htj_100to400', 'ALP_Ntuple_m_50_htj_400toInf']
+    # # signal_sample = ['ALP_Ntuple_m_30_htj_100to400','ALP_Ntuple_m_30_htj_400toInf', 'ALP_Ntuple_m_20_htj_100to400', 'ALP_Ntuple_m_20_htj_400toInf', 'ALP_Ntuple_m_50_htj_100to400', 'ALP_Ntuple_m_50_htj_400toInf']
+    # signal_sample = ['ALP_Ntuple_m_15_htj_100to400','ALP_Ntuple_m_15_htj_400toInf']
     signal_mass = [x.split("_")[0]+'_'+x.split("_")[1]+'_'+x.split("_")[2]+'_'+x.split("_")[3] for x in signal_sample]
     signal_mass = list(set(signal_mass))
-    bkg_sample = ['DYJetsToLL','DYJetsToLL_M-4to50','WJetsToLNu','Diboson','ST','QCD','TT']
-    # bkg_sample = ['DYJetsToLL','DYJetsToLL_M-4to50','WJetsToLNu']
+    # bkg_sample = ['Ntuple_DYJetsToLL','Ntuple_DYJetsToLL_M-4to50','Ntuple_WJetsToLNu','Ntuple_Diboson','Ntuple_TT']
+    bkg_sample = ['DYJetsToLL','DYJetsToLL_M-4to50','WJetsToLNu','Diboson','ST','TT']
     Sample = signal_sample+bkg_sample
 if args.bkg :
     # Sample = ['DYJetsToLL','DYJetsToLL_M-4to50','QCD','WJetsToLNu','Diboson','ST','TT']
-    Sample = ['TT']
+    Sample = ['TT','ST','Diboson']
 
 
 #VARIABLE = ['Mass', 'Lepton1Pt', 'Lepton2Pt', 'JetPt', 'MetPt', 'Mt','Nj','dRl','dRj', 'dPhil', 'dPhi','Count']
@@ -339,12 +349,15 @@ for var in histlist:
     weightBackgroundHists(hists, files, version, study, var, Sample)
 
     if scaling == 'xsection':
-         out = ROOT.TFile("h_"+var+"_"+study+"_"+iteration+"_"+model+".root",'recreate')
+         # out = ROOT.TFile("h_"+var+"_"+study+"_"+iteration+"_"+model+".root",'recreate')
+         out = ROOT.TFile("h_"+var+"_"+study+"_"+iteration+".root",'recreate')
          print(out)
     else: 
          out = ROOT.TFile("h_"+study+"_"+var+"_"+version+"_unity.root",'recreate')
 
     out.cd()
+
+    print(hists)
 
     for name in Sample:
         if name=='DYJetsToLL':
@@ -369,8 +382,8 @@ for var in histlist:
             hists[name].SetFillColor(ROOT.kGreen-6)
 
         if name not in signal_sample:
-            # hists[name].SetName(name+"_EMu_SR_2017_OS_Boost_Mass")
-            # hists[name].Write(name+"_EMu_SR_2017_OS_Boost_Mass", ROOT.TObject.kWriteDelete)
+            # hists[name].SetName("ETau_hBJetPt")
+            # hists[name].Write("ETau_hBJetPt", ROOT.TObject.kWriteDelete)
             hists[name].Write()
             print(hists[name].GetName())
             print(name)
@@ -387,8 +400,8 @@ for var in histlist:
                     print(sig+"_"+var)
                     tmp[sig].SetName(sig+"_"+var)
                     tmp[sig].Write(sig+"_"+var, ROOT.TObject.kWriteDelete)
-                    # tmp[sig].SetName(sig+"_EMu_SR_2017_OS_Boost_Mass")
-                    # tmp[sig].Write(sig+"_EMu_SR_2017_OS_Boost_Mass", ROOT.TObject.kWriteDelete)
+                    # tmp[sig].SetName(sig+"_ETau_SR_2017_OS_Boost_Mass")
+                    # tmp[sig].Write(sig+"_ETau_SR_2017_OS_Boost_Mass", ROOT.TObject.kWriteDelete)
                     
 
     out.Close()
